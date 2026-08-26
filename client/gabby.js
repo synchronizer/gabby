@@ -21,8 +21,8 @@ document.addEventListener('submit', async (event) => {
     try {
 
         const response = await fetch(
-            // 'https://gabby-zw4z.onrender.com/api/submit',
-            'http://localhost:3000/api/submit',
+            'https://gabby-zw4z.onrender.com/api/submit',
+            // 'http://localhost:3000/api/submit',
             {
                 method: 'POST',
                 headers: {
