@@ -16,7 +16,7 @@ const serviceAccount = require('./serviceAccountKey.json')
 
 initializeApp({
     credential: cert(serviceAccount),
-    databaseURL: 'https://form-from-543fb-default-rtdb.europe-west1.firebasedatabase.app/'
+    databaseURL: process.env.FIREBASE_DATABASE_URL
 })
 
 const db = getDatabase()
