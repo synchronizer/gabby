@@ -1,4 +1,4 @@
-const BOT_TOKEN = '8555464304:AAGHs4TvL74kmndkxWQ6jIRzEiu-bj6NlgY';
+const BOT_TOKEN = process.env.BOT_TOKEN
 
 
 
