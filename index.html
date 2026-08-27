@@ -43,36 +43,43 @@
     </style>
     <form class="gabby" data-gabby-id="ff_06oqgh88">
 
-        <input required type="text" class="gabby__input" data-gabby="Имя" placeholder="Имя">
+        <input required type="text" class="gabby__input" data-gabby="👤 Имя" placeholder="Имя" value="Василий">
+        <input required type="text" class="gabby__input" data-gabby="☎️ Телефон" placeholder="Телефон"
+            value="+7 906 073-51-31">
 
-        <input required type="tel" class="gabby__input" data-gabby="Телефон" placeholder="Телефон">
-        <input required type="tel" class="gabby__input" data-gabby="Телефон-2" placeholder="Телефон-2">
-        <input required type="tel" class="gabby__input" data-gabby="Телефон-3" placeholder="Телефон-3">
-
-        <textarea class="gabby__input" data-gabby="Комментарий" placeholder="Комментарий"></textarea>
-
+        <!-- Gabby service field. Do not remove. -->
+        <input
+            type="text"
+            class="gabby__input"
+            data-gabby="gabby_extra"
+            tabindex="-1"
+            autocomplete="off"
+            aria-hidden="true"
+            style="position:absolute; left:-9999px;"
+        >
         <button class="gabby__button" type="submit">
             Отправить
         </button>
 
     </form>
 
-    <script src="client/gabby.js"></script>
+    <script src="./client/gabby.js" data-gabby-api="http://localhost:3000"></script>
+    <!-- <script src="https://gabby-cdn.onrender.com/gabby.js"></script> -->
 
     <script>
         const form = document.querySelector('[data-gabby-id]')
         const button = form.querySelector('button[type="submit"]')
 
-        window.addEventListener('gabby:submit:start', () => {
+        form.addEventListener('gabby:submit:start', () => {
             button.disabled = true
             button.textContent = 'Отправляем…'
         })
 
-        window.addEventListener('gabby:submit:success', () => {
+        form.addEventListener('gabby:submit:success', () => {
             button.textContent = 'Отправлено ✓'
         })
 
-        window.addEventListener('gabby:submit:error', () => {
+        form.addEventListener('gabby:submit:error', () => {
             button.disabled = false
             button.textContent = 'Ошибка. Повторить'
         })

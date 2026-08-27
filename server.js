@@ -11,6 +11,7 @@ const BOT_TOKEN = process.env.BOT_TOKEN
 
 const { initializeApp, cert } = require('firebase-admin/app')
 const { getDatabase } = require('firebase-admin/database')
+const crypto = require('crypto')
 
 const serviceAccount = require('./serviceAccountKey.json')
 
@@ -178,7 +179,8 @@ async function sendTelegramMessage(chatId, text) {
             },
             body: JSON.stringify({
                 chat_id: chatId,
-                text
+                text,
+                parse_mode: 'HTML'
             })
         }
     )
@@ -213,9 +215,157 @@ fastify.get('/', async () => {
     }
 })
 
+
+// =======================================
+// Protection: Rate Limit
+// =======================================
+
+const rateLimits = new Map()
+
+const RATE_LIMIT = 3
+const RATE_WINDOW = 60 * 1000
+
+function protectionRateLimit(formId, ip) {
+
+    const key = `${formId}:${ip}`
+    const now = Date.now()
+
+    const timestamps = rateLimits.get(key) || []
+
+    const recent = timestamps.filter(
+        timestamp => now - timestamp < RATE_WINDOW
+    )
+
+    if (recent.length >= RATE_LIMIT) {
+        rateLimits.set(key, recent)
+
+        return false
+    }
+
+    recent.push(now)
+
+    rateLimits.set(key, recent)
+
+    return true
+}
+
+
+// =======================================
+// Protection: Honeypot
+// =======================================
+
+function protectionHoneypot(data) {
+
+    return !data.gabby_extra
+}
+
+// =======================================
+// Protection: Token
+// =======================================
+
+const tokens = new Map()
+
+const TOKEN_LIFETIME = 300 * 1000
+
+function generateToken() {
+    return crypto.randomUUID()
+}
+
+function createToken(formId) {
+
+    const token = generateToken()
+
+    tokens.set(token, {
+        formId,
+        expiresAt: Date.now() + TOKEN_LIFETIME
+    })
+
+    return token
+}
+
+function protectionToken(formId, token) {
+
+    const record = tokens.get(token)
+
+    if (!record) {
+        return false
+    }
+
+    if (record.formId !== formId) {
+        return false
+    }
+
+    if (Date.now() > record.expiresAt) {
+        tokens.delete(token)
+        return false
+    }
+
+    tokens.delete(token)
+
+    return true
+}
+
+fastify.post('/api/prepare', async (request, reply) => {
+
+    const { form_id } = request.body
+
+    const snapshot = await db
+        .ref(`forms/${form_id}`)
+        .once('value')
+
+    const form = snapshot.val()
+
+    if (!form) {
+        return reply.code(404).send({
+            success: false,
+            error: 'FORM_NOT_FOUND'
+        })
+    }
+
+    const token = createToken(form_id)
+
+    return {
+        success: true,
+        token
+    }
+})
+
+
+// =======================================
+// Submit
+// =======================================
+
 fastify.post('/api/submit', async (request, reply) => {
 
-    console.log('========== GABBY REQUEST ==========')
+    const clientIp =
+        request.headers['cf-connecting-ip'] || 'unknown'
+
+    const { form_id, token, data } = request.body
+
+    console.log('Client IP:', clientIp)
+
+    if (!protectionHoneypot(data)) {
+        return reply.code(400).send({
+            success: false,
+            error: 'HONEYPOT'
+        })
+    }
+
+    if (!protectionRateLimit(form_id, clientIp)) {
+        return reply.code(429).send({
+            success: false,
+            error: 'RATE_LIMIT'
+        })
+    }
+
+    if (!protectionToken(form_id, token)) {
+        return reply.code(403).send({
+            success: false,
+            error: 'INVALID_TOKEN'
+        })
+    }
+
+    console.log('========== GABBY REQUEST 2 ==========')
 
     console.log('IP:', request.ip)
 
@@ -236,12 +386,10 @@ fastify.post('/api/submit', async (request, reply) => {
     console.log('X-Forwarded-For:', request.headers['x-forwarded-for'])
 
     console.log('X-Real-IP:', request.headers['x-real-ip'])
-    
+
     console.log('CF-Connecting-IP:', request.headers['cf-connecting-ip'])
 
     console.log('====================================')
-
-    const { form_id, data } = request.body
 
     const snapshot = await db
         .ref(`forms/${form_id}`)
@@ -257,13 +405,16 @@ fastify.post('/api/submit', async (request, reply) => {
     }
 
     try {
+
+        const origin = request.headers.origin || 'неизвестный сайт'
+
         await sendTelegramMessage(
             form.chat_id,
-            `🔔 Новая заявка
+            `<b>Новая заявка</b>
 
 ${Object.entries(data)
-                .map(([label, value]) => `${label}: ${value}`)
-                .join('\n')}`
+                .map(([label, value]) => `${label}: <code>${value}</code>`)
+                .join('\n\n')}`
         )
 
         return {
@@ -271,6 +422,7 @@ ${Object.entries(data)
         }
 
     } catch (error) {
+
         request.log.error(error)
 
         return reply.code(500).send({
@@ -279,6 +431,7 @@ ${Object.entries(data)
         })
     }
 })
+
 
 fastify.listen({
     port: process.env.PORT || 3000,

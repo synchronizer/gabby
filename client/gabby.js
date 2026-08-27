@@ -1,3 +1,8 @@
+const apiUrl =
+    document.currentScript.dataset.gabbyApi ||
+    'https://gabby-zw4z.onrender.com'
+
+
 document.addEventListener('submit', async (event) => {
 
     const form = event.target
@@ -16,13 +21,50 @@ document.addEventListener('submit', async (event) => {
         data[field.dataset.gabby] = field.value
     })
 
-    window.dispatchEvent(new CustomEvent('gabby:submit:start'))
+
+    // =======================================
+    // Submit start
+    // =======================================
+
+    form.dispatchEvent(
+        new CustomEvent('gabby:submit:start', {
+            bubbles: true
+        })
+    )
+
 
     try {
 
+        // =======================================
+        // Prepare
+        // =======================================
+
+        const prepareResponse = await fetch(
+            `${apiUrl}/api/prepare`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    form_id: formId
+                })
+            }
+        )
+
+        const prepareResult = await prepareResponse.json()
+
+        if (!prepareResult.success) {
+            throw new Error(prepareResult.error)
+        }
+
+
+        // =======================================
+        // Submit
+        // =======================================
+
         const response = await fetch(
-            'https://gabby-zw4z.onrender.com/api/submit',
-            // 'http://localhost:3000/api/submit',
+            `${apiUrl}/api/submit`,
             {
                 method: 'POST',
                 headers: {
@@ -30,6 +72,7 @@ document.addEventListener('submit', async (event) => {
                 },
                 body: JSON.stringify({
                     form_id: formId,
+                    token: prepareResult.token,
                     data
                 })
             }
@@ -41,18 +84,35 @@ document.addEventListener('submit', async (event) => {
             throw new Error(result.error)
         }
 
-        window.dispatchEvent(
-            new CustomEvent('gabby:submit:success')
+
+        // =======================================
+        // Submit success
+        // =======================================
+
+        form.dispatchEvent(
+            new CustomEvent('gabby:submit:success', {
+                bubbles: true
+            })
         )
+
 
     } catch (error) {
 
-        window.dispatchEvent(
-            new CustomEvent('gabby:submit:error', {
-                detail: {
-                    error: error.message
+
+        // =======================================
+        // Submit error
+        // =======================================
+
+        form.dispatchEvent(
+            new CustomEvent(
+                'gabby:submit:error',
+                {
+                    bubbles: true,
+                    detail: {
+                        error: error.message
+                    }
                 }
-            })
+            )
         )
 
     }
