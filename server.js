@@ -80,81 +80,81 @@ async function getTelegramUpdates() {
                 }
 
                 await sendTelegramMessage(
-                    message.chat.id,
-                    `Готово! Форма создана.
+    message.chat.id,
+    `Готово! Форма создана.
 
 Вставьте этот код на свой сайт:
 
- 
-    <style>
-        .gabby {
-            width: min(20rem, 100%);
-            padding: 1.5rem;
-            border-radius: 1rem;
-            display: grid;
-            gap: 1rem;
-            box-shadow: 0 0 0 2px canvasText;
-            background-color: canvas;
-        }
+<pre><code>&lt;style&gt;
+    .gabby {
+        width: min(20rem, 100%);
+        padding: 1.5rem;
+        border-radius: 1rem;
+        display: grid;
+        gap: 1rem;
+        box-shadow: 0 0 0 2px canvasText;
+        background-color: canvas;
+    }
 
-        .gabby__input,
-        .gabby__button {
-            box-shadow: 0 0 0 2px canvasText;
-            background-color: canvas;
-            border-radius: .5rem;
-            height: 3rem;
-            border: none;
-            padding-inline: 1rem;
-            padding-block: .5rem;
-            box-sizing: border-box;
-            resize: vertical;
-        }
+    .gabby__input,
+    .gabby__button {
+        box-shadow: 0 0 0 2px canvasText;
+        background-color: canvas;
+        border-radius: .5rem;
+        height: 3rem;
+        border: none;
+        padding-inline: 1rem;
+        padding-block: .5rem;
+        box-sizing: border-box;
+        resize: vertical;
+    }
 
-        .gabby__button {
-            box-shadow: none;
-            background-color: canvastext;
-            color: canvas;
-            font-size: 1rem;
-            font-family: monospace;
-        }
-    </style>
-    <form class="gabby" data-gabby-id="${formId}">
+    .gabby__button {
+        box-shadow: none;
+        background-color: canvastext;
+        color: canvas;
+        font-size: 1rem;
+        font-family: monospace;
+    }
+&lt;/style&gt;
 
-        <input required type="text" class="gabby__input" data-gabby="Имя" placeholder="Имя">
+&lt;form class="gabby" data-gabby-id="${formId}"&gt;
 
-        <input required type="tel" class="gabby__input" data-gabby="Телефон" placeholder="Телефон">
-        <input required type="tel" class="gabby__input" data-gabby="Телефон-2" placeholder="Телефон-2">
-        <input required type="tel" class="gabby__input" data-gabby="Телефон-3" placeholder="Телефон-3">
+    &lt;input required type="text" class="gabby__input" data-gabby="Имя" placeholder="Имя"&gt;
 
-        <textarea class="gabby__input" data-gabby="Комментарий" placeholder="Комментарий"></textarea>
+    &lt;input required type="tel" class="gabby__input" data-gabby="Телефон" placeholder="Телефон"&gt;
+    &lt;input required type="tel" class="gabby__input" data-gabby="Телефон-2" placeholder="Телефон-2"&gt;
+    &lt;input required type="tel" class="gabby__input" data-gabby="Телефон-3" placeholder="Телефон-3"&gt;
 
-        <button class="gabby__button" type="submit">
-            Отправить
-        </button>
+    &lt;textarea class="gabby__input" data-gabby="Комментарий" placeholder="Комментарий"&gt;&lt;/textarea&gt;
 
-    </form>
+    &lt;button class="gabby__button" type="submit"&gt;
+        Отправить
+    &lt;/button&gt;
 
-    <script src="gabby.js"></script>
+&lt;/form&gt;
 
-    <script>
-        const form = document.querySelector('[data-gabby-id]')
-        const button = form.querySelector('button[type="submit"]')
+&lt;script src="gabby.js"&gt;&lt;/script&gt;
 
-        window.addEventListener('gabby:submit:start', () => {
-            button.disabled = true
-            button.textContent = 'Отправляем…'
-        })
+&lt;script&gt;
+    const form = document.querySelector('[data-gabby-id]')
+    const button = form.querySelector('button[type="submit"]')
 
-        window.addEventListener('gabby:submit:success', () => {
-            button.textContent = 'Отправлено ✓'
-        })
+    window.addEventListener('gabby:submit:start', () =&gt; {
+        button.disabled = true
+        button.textContent = 'Отправляем…'
+    })
 
-        window.addEventListener('gabby:submit:error', () => {
-            button.disabled = false
-            button.textContent = 'Ошибка. Повторить'
-        })
-    </script>`
-                )
+    window.addEventListener('gabby:submit:success', () =&gt; {
+        button.textContent = 'Отправлено ✓'
+    })
+
+    window.addEventListener('gabby:submit:error', () =&gt; {
+        button.disabled = false
+        button.textContent = 'Ошибка. Повторить'
+    })
+&lt;/script&gt;</code></pre>`
+)
             }
 
             offset = update.update_id + 1
@@ -359,11 +359,11 @@ fastify.post('/api/submit', async (request, reply) => {
     }
 
     if (!protectionToken(form_id, token)) {
-        return reply.code(403).send({
-            success: false,
-            error: 'INVALID_TOKEN'
-        })
-    }
+    return reply.code(403).send({
+        success: false,
+        error: 'INVALID_TOKEN'
+    })
+}
 
     console.log('========== GABBY REQUEST 2 ==========')
 
