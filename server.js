@@ -215,12 +215,23 @@ fastify.get('/', async () => {
 
 fastify.post('/api/submit', async (request, reply) => {
 
-    console.log('--- REQUEST ---')
+    console.log('========== GABBY REQUEST ==========')
+
     console.log('IP:', request.ip)
+
     console.log('Origin:', request.headers.origin)
+
     console.log('Referer:', request.headers.referer)
+
     console.log('User-Agent:', request.headers['user-agent'])
-    console.log('----------------')
+
+    console.log('Content-Type:', request.headers['content-type'])
+
+    console.log('Host:', request.headers.host)
+
+    console.log('Body:', JSON.stringify(request.body, null, 2))
+
+    console.log('====================================')
 
     const { form_id, data } = request.body
 
