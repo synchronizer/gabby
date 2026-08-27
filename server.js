@@ -233,6 +233,14 @@ fastify.post('/api/submit', async (request, reply) => {
 
     console.log('====================================')
 
+    console.log('X-Forwarded-For:', request.headers['x-forwarded-for'])
+
+    console.log('X-Real-IP:', request.headers['x-real-ip'])
+    
+    console.log('CF-Connecting-IP:', request.headers['cf-connecting-ip'])
+
+    console.log('====================================')
+
     const { form_id, data } = request.body
 
     const snapshot = await db
