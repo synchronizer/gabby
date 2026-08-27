@@ -6,41 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>🖥️ Gabby — Test LOCAL</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <style>
-        .gabby {
-            width: min(20rem, 100%);
-            padding: 1.5rem;
-            border-radius: 1rem;
-            display: grid;
-            gap: 1rem;
-            box-shadow: 0 0 0 2px canvasText;
-            background-color: canvas;
-        }
-
-        .gabby__input,
-        .gabby__button {
-            box-shadow: 0 0 0 2px canvasText;
-            background-color: canvas;
-            border-radius: .5rem;
-            height: 3rem;
-            border: none;
-            padding-inline: 1rem;
-            padding-block: .5rem;
-            box-sizing: border-box;
-            resize: vertical;
-        }
-
-        .gabby__button {
-            box-shadow: none;
-            background-color: canvastext;
-            color: canvas;
-            font-size: 1rem;
-            font-family: monospace;
-        }
-    </style>
+    
     <form class="gabby" data-gabby-id="ff_06oqgh88">
 
         <input required type="text" class="gabby__input" data-gabby="👤 Имя" placeholder="Имя" value="Василий">
@@ -66,24 +36,7 @@
     <script src="./client/gabby.js" data-gabby-api="http://localhost:3000"></script>
     <!-- <script src="https://gabby-cdn.onrender.com/gabby.js"></script> -->
 
-    <script>
-        const form = document.querySelector('[data-gabby-id]')
-        const button = form.querySelector('button[type="submit"]')
-
-        form.addEventListener('gabby:submit:start', () => {
-            button.disabled = true
-            button.textContent = 'Отправляем…'
-        })
-
-        form.addEventListener('gabby:submit:success', () => {
-            button.textContent = 'Отправлено ✓'
-        })
-
-        form.addEventListener('gabby:submit:error', () => {
-            button.disabled = false
-            button.textContent = 'Ошибка. Повторить'
-        })
-    </script>
+    <script src="script.js"></script>
 
 </body>
 

@@ -1,0 +1,28 @@
+.gabby {
+            width: min(20rem, 100%);
+            padding: 2rem;
+            border-radius: 1rem;
+            display: grid;
+            gap: 1rem;
+            background-color: color-mix(in oklch, canvas 92%, canvastext);
+        }
+
+        .gabby__input,
+        .gabby__button {
+            /* box-shadow: 0 0 0 2px canvasText; */
+            background-color: color-mix(in oklch, canvas 85%, canvastext);
+            border-radius: .5rem;
+            height: 3rem;
+            border: none;
+            padding-inline: 1rem;
+            padding-block: .5rem;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+
+        .gabby__button {
+            box-shadow: none;
+            background-color: canvastext;
+            color: canvas;
+            font-size: 1rem;
+        }

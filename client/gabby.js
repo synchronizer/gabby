@@ -1,6 +1,6 @@
 const apiUrl =
     document.currentScript.dataset.gabbyApi ||
-    'https://gabby-zw4z.onrender.com'
+    'https://gabby-test.synchronizer.workers.dev'
 
 
 document.addEventListener('submit', async (event) => {
