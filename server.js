@@ -265,7 +265,7 @@ function protectionHoneypot(data) {
 
 const tokens = new Map()
 
-const TOKEN_LIFETIME = 300 * 1000
+const TOKEN_LIFETIME = 30 * 1000
 
 function generateToken() {
     return crypto.randomUUID()
