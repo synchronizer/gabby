@@ -34,54 +34,55 @@ function generateFormId() {
 let offset = 0
 
 async function getTelegramUpdates() {
-    const response = await fetch(
-        `https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${offset}`
-    )
+    try {
+        const response = await fetch(
+            `https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${offset}`
+        )
 
-    const result = await response.json()
+        const result = await response.json()
 
-    console.log(result)
+        console.log(result)
 
-    if (result.ok && result.result.length > 0) {
-        for (const update of result.result) {
-            const message = update.message
+        if (result.ok && result.result.length > 0) {
+            for (const update of result.result) {
+                const message = update.message
 
-            if (message?.text === '/form') {
+                if (message?.text === '/form') {
 
-                const formsSnapshot = await db
-                    .ref('forms')
-                    .orderByChild('chat_id')
-                    .equalTo(message.chat.id)
-                    .once('value')
+                    const formsSnapshot = await db
+                        .ref('forms')
+                        .orderByChild('chat_id')
+                        .equalTo(message.chat.id)
+                        .once('value')
 
-                const forms = formsSnapshot.val()
+                    const forms = formsSnapshot.val()
 
-                let formId
+                    let formId
 
-                if (forms) {
-                    formId = Object.keys(forms)[0]
+                    if (forms) {
+                        formId = Object.keys(forms)[0]
 
-                    console.log('Форма уже существует:', formId)
-                    console.log('Chat ID:', message.chat.id)
+                        console.log('Форма уже существует:', formId)
+                        console.log('Chat ID:', message.chat.id)
 
-                } else {
+                    } else {
 
-                    formId = generateFormId()
+                        formId = generateFormId()
 
-                    await db.ref(`forms/${formId}`).set({
-                        chat_id: message.chat.id,
-                        enabled: true,
-                        origins: {},
-                        created_at: Date.now()
-                    })
+                        await db.ref(`forms/${formId}`).set({
+                            chat_id: message.chat.id,
+                            enabled: true,
+                            origins: {},
+                            created_at: Date.now()
+                        })
 
-                    console.log('Форма создана:', formId)
-                    console.log('Chat ID:', message.chat.id)
-                }
+                        console.log('Форма создана:', formId)
+                        console.log('Chat ID:', message.chat.id)
+                    }
 
-                await sendTelegramMessage(
-    message.chat.id,
-    `Готово! Форма создана.
+                    await sendTelegramMessage(
+                        message.chat.id,
+                        `Готово! Форма создана.
 
 Вставьте этот код на свой сайт:
 
@@ -118,17 +119,33 @@ async function getTelegramUpdates() {
     }
 &lt;/style&gt;
 
-&lt;form class="gabby" data-gabby-id="${formId}"&gt;
+&lt;form
+    class="gabby"
+    data-gabby-id="${formId}"&gt;
 
-    &lt;input required type="text" class="gabby__input" data-gabby="Имя" placeholder="Имя"&gt;
+    &lt;input
+        required
+        type="text"
+        class="gabby__input"
+        data-gabby="Имя"
+        placeholder="Имя"&gt;
 
-    &lt;input required type="tel" class="gabby__input" data-gabby="Телефон" placeholder="Телефон"&gt;
-    &lt;input required type="tel" class="gabby__input" data-gabby="Телефон-2" placeholder="Телефон-2"&gt;
-    &lt;input required type="tel" class="gabby__input" data-gabby="Телефон-3" placeholder="Телефон-3"&gt;
+    &lt;input
+        required
+        type="tel"
+        class="gabby__input"
+        data-gabby="Телефон"
+        placeholder="Телефон"&gt;
 
-    &lt;textarea class="gabby__input" data-gabby="Комментарий" placeholder="Комментарий"&gt;&lt;/textarea&gt;
+    &lt;textarea
+        class="gabby__input"
+        data-gabby="Комментарий"
+        placeholder="Комментарий"
+    &gt;&lt;/textarea&gt;
 
-    &lt;button class="gabby__button" type="submit"&gt;
+    &lt;button
+        class="gabby__button"
+        type="submit"&gt;
         Отправить
     &lt;/button&gt;
 
@@ -154,11 +171,15 @@ async function getTelegramUpdates() {
         button.textContent = 'Ошибка. Повторить'
     })
 &lt;/script&gt;</code></pre>`
-)
-            }
+                    )
+                }
 
-            offset = update.update_id + 1
+                offset = update.update_id + 1
+            }
         }
+
+    } catch (error) {
+        console.error('Telegram polling error:', error)
     }
 
     setTimeout(getTelegramUpdates, 1000)
@@ -359,11 +380,11 @@ fastify.post('/api/submit', async (request, reply) => {
     }
 
     if (!protectionToken(form_id, token)) {
-    return reply.code(403).send({
-        success: false,
-        error: 'INVALID_TOKEN'
-    })
-}
+        return reply.code(403).send({
+            success: false,
+            error: 'INVALID_TOKEN'
+        })
+    }
 
     console.log('========== GABBY REQUEST 2 ==========')
 
@@ -410,11 +431,13 @@ fastify.post('/api/submit', async (request, reply) => {
 
         await sendTelegramMessage(
             form.chat_id,
-            `<b>Новая заявка</b>
+            `<pre><code class="language-html"><b>Новая заявка</b>
 
 ${Object.entries(data)
-                .map(([label, value]) => `${label}: <code>${value}</code>`)
-                .join('\n\n')}`
+                .map(([label, value]) => `${label}: ${value}`)
+                .join('\n\n')}
+
+Источник: ${origin}</code></pre>`
         )
 
         return {
