@@ -288,13 +288,10 @@ const tokens = new Map()
 
 const TOKEN_LIFETIME = 30 * 1000
 
-function generateToken() {
-    return crypto.randomUUID()
-}
 
 function createToken(formId) {
 
-    const token = generateToken()
+    const token = crypto.randomUUID()
 
     tokens.set(token, {
         formId,
