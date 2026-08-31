@@ -1,8 +1,6 @@
-console.log('GABBY LOADED')
-
 const apiUrl =
     document.currentScript.dataset.gabbyApi ||
-    'https://gabby-test.synchronizer.workers.dev'
+    'https://gabby-zw4z.onrender.com'
 
 
 document.addEventListener('submit', async (event) => {
