@@ -11,6 +11,7 @@
   "description": "",
   "dependencies": {
     "@fastify/cors": "^11.3.0",
+    "dotenv": "^17.4.2",
     "fastify": "^5.12.1",
     "firebase-admin": "^13.10.0"
   }
